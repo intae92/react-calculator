@@ -33300,8 +33300,11 @@ const react_1 = __importDefault(__webpack_require__(/*! react */ "./node_modules
 const client_1 = __importDefault(__webpack_require__(/*! react-dom/client */ "./node_modules/react-dom/client.js"));
 const Calculator_1 = __importDefault(__webpack_require__(/*! ./Calculator */ "./src/Calculator.tsx"));
 __webpack_require__(/*! ./scss/style.scss */ "./src/scss/style.scss");
-const root = client_1.default.createRoot(document.getElementById('root'));
-root.render(react_1.default.createElement(Calculator_1.default, null));
+const $root = document.querySelector('#root');
+if ($root) {
+    const root = client_1.default.createRoot($root);
+    root.render(react_1.default.createElement(Calculator_1.default, null));
+}
 
 
 /***/ })
