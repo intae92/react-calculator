@@ -8,3 +8,17 @@ if ($root) {
   const root = ReactDOM.createRoot($root);
   root.render(<Calculator />);
 }
+
+console.log(process);
+const a = 'a';
+const b = 'b';
+const c = () => {
+  return null;
+};
+const d = () => {
+  return null;
+};
+
+a && c();
+
+c() || d();

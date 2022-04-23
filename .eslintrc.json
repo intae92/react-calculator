@@ -1,11 +1,22 @@
 {
+  // 사전 정의된 전역 변수 사용을 정의한다.
   "env": {
     "browser": true,
     "es2022": true,
     "jest": true
   },
+  // https://github.com/eslint/espree
+  // ESLint는 구문 분석을 위해 기본적으로 Espree 파서를 사용합니다.
+  /* Babel과 함께 사용되는 파서로는babel-eslint가 있고 
+  Typescript 구문 분석을 위해 사용되는@typescript-eslint/parser가 있습니다.*/
   "parser": "@typescript-eslint/parser",
+  // 프로그래밍에서의 서드파티란 프로그래밍을 도와주는 plug_in 이나 library 등을 만드는 회사를 말한다.
+  // https://eslint.org/docs/user-guide/configuring/plugins#plugins
   "plugins": ["@typescript-eslint", "prettier"],
+  // extends는 추가한 플러그인에서 사용할 규칙을 설정합니다.
+  // 플러그인은 일련의 규칙 집합이며, 플러그인을 추가하여도 규칙은 적용되지 않습니다.
+  // 규칙을 적용하기 위해서는 추가한 플러그인 중, 사용할 규칙을 추가해주어야 적용이 됩니다.
+  // 여기서 eslint-plugin- 접두사를 생략하고 plugin:를 사용하여 사용할 플러그인을 지정할 수
   "extends": [
     "airbnb",
     "plugin:react/recommended",
@@ -14,18 +25,30 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:import/typescript"
   ],
+  // parserOptions은 ESLint 사용을 위해 지원하려는 Javascript 언어 옵션을 지정할 수 있습니다.
   "parserOptions": {
-    "sourceType": "module",
-    "ecmaVersion": "latest",
+    "sourceType": "module", // sourceType: parser의 export 형태를 설정
+    "ecmaVersion": "latest", // ecmaVersion: 사용할 ECMAScript 버전을 설정
+    // ecmaFeatures: ECMAScript의 언어 확장 기능을 설정
     "ecmaFeatures": {
-      "jsx": true
+      "jsx": true // jsx: ECMScript 규격의 JSX 사용 여부
+      // globalReturn: 전역 스코프의 사용 여부 (node, commonjs 환경에서 최상위 스코프는 module)
+      // impliedStric: strict mode 사용 여부
     }
   },
+  // "off" 또는 0: 규칙을 사용하지 않음
+  // "warn" 또는 1: 규칙을 경고로 사용
+  // "error" 또는 2: 규칙을 오류로 사용
   "rules": {
-    "no-alert": "off",
+    "no-alert": "off", // alert, confirm, propmt 경고
     "max-depth": ["error", 2],
+    // no-unused-expressions 사용하지 않는 표현식
+    /* allowShortCircuit 기본값: false, 표현식에서 단락 평가
+    https://runebook.dev/ko/docs/eslint/rules/no-unused-expressions
+     ex) a || b (x), a && b() (o)
+     */
     "no-unused-expressions": ["error", { "allowShortCircuit": true }],
-    "class-methods-use-this": "off",
+    "class-methods-use-this": "off", // 클래스의 메서드가 this 사용하게 할 것
     "@typescript-eslint/no-explicit-any": "off",
     "prettier/prettier": ["error"],
     "react/jsx-filename-extension": ["warn", { "extensions": [".tsx"] }],
