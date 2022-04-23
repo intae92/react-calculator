@@ -33156,6 +33156,13 @@ const react_1 = __importStar(__webpack_require__(/*! react */ "./node_modules/re
 const DigitButton_1 = __importDefault(__webpack_require__(/*! ./components/DigitButton */ "./src/components/DigitButton.tsx"));
 const OperatorButton_1 = __importDefault(__webpack_require__(/*! ./components/OperatorButton */ "./src/components/OperatorButton.tsx"));
 const types_1 = __importDefault(__webpack_require__(/*! ./types */ "./src/types.ts"));
+const ERROR_MESSAGE = {
+    NOT_NUMBER: '숫자 아님',
+    INFINITY_NUMBER: '오류',
+    NOT_OPERATOR: '유효한 연산자가 아닙니다',
+    INPUT_ORDER: '숫자를 먼저 입력해 주세요',
+    MAX_DIGIT: '최대 세자리 숫자까지만 입력이 됩니다.',
+};
 const operators = [types_1.default.plus, types_1.default.minus, types_1.default.multiply, types_1.default.divide];
 // [9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
 const DIGITS = Array.from({ length: 10 }, (_, i) => ({ id: (0, nanoid_1.nanoid)(), digit: 9 - i }));
@@ -33168,59 +33175,71 @@ const initialState = {
 const errorState = (errorMessage) => (Object.assign(Object.assign({}, initialState), { result: errorMessage }));
 function Calculator() {
     const [state, setState] = (0, react_1.useState)(Object.assign({}, initialState));
-    // useCallback
     const plus = (num1, num2) => num1 + num2;
     const minus = (num1, num2) => num1 - num2;
     const multiply = (num1, num2) => num1 * num2;
     const divide = (num1, num2) => num1 / num2;
+    const updateNumber = ({ isPrevNumberTurn, newNumber }) => {
+        if (isPrevNumberTurn) {
+            setState(prevState => (Object.assign(Object.assign({}, prevState), { prevNumber: newNumber, result: `${newNumber}` })));
+            return;
+        }
+        setState(prevState => (Object.assign(Object.assign({}, prevState), { nextNumber: newNumber, result: `${newNumber}` })));
+    };
     const onClickDigitBtn = ({ target }) => {
         const { prevNumber, nextNumber, operator } = state;
         const { digit } = target.dataset;
         if (!digit)
             return;
         const isPrevNumberTurn = operator === types_1.default.empty;
-        // TODO: 리팩토링 할 것
-        if (isPrevNumberTurn) {
-            if (prevNumber === null) {
-                const _prevNumber = Number(digit);
-                setState(Object.assign(Object.assign({}, state), { prevNumber: _prevNumber, result: `${_prevNumber}` }));
-                return;
-            }
-            if (`${prevNumber}`.length >= 3)
-                return;
-            const _prevNumber = Number(prevNumber + digit);
-            setState(Object.assign(Object.assign({}, state), { prevNumber: _prevNumber, result: `${_prevNumber}` }));
+        const targetNumber = isPrevNumberTurn ? prevNumber : nextNumber;
+        if (targetNumber === null) {
+            updateNumber({ isPrevNumberTurn, newNumber: Number(digit) });
             return;
         }
-        if (nextNumber === null) {
-            const _nextNumber = Number(digit);
-            setState(Object.assign(Object.assign({}, state), { nextNumber: _nextNumber, result: `${_nextNumber}` }));
+        if (`${targetNumber}`.length >= 3) {
+            window.alert(ERROR_MESSAGE.MAX_DIGIT);
             return;
         }
-        if (`${nextNumber}`.length >= 3)
-            return;
-        const _nextNumber = Number(nextNumber + digit);
-        setState(Object.assign(Object.assign({}, state), { nextNumber: _nextNumber, result: `${_nextNumber}` }));
+        updateNumber({ isPrevNumberTurn, newNumber: Number(targetNumber + digit) });
     };
+    const onClickReset = () => setState(Object.assign({}, initialState));
     const onClickOperator = ({ target }) => {
-        // TODO: 개행 리팩토링
         const { prevNumber } = state;
         const { operator } = target.dataset;
         if (!operator)
             return;
         const isValidOperator = Object.values(types_1.default).includes(operator);
         if (!isValidOperator) {
-            setState(Object.assign({}, errorState('유효한 연산자가 아닙니다')));
+            setState(Object.assign({}, errorState(ERROR_MESSAGE.NOT_OPERATOR)));
             return;
         }
         if (!prevNumber) {
-            setState(Object.assign({}, errorState('숫자를 먼저 입력해 주세요')));
+            setState(Object.assign({}, errorState(ERROR_MESSAGE.INPUT_ORDER)));
             return;
         }
         setState(Object.assign(Object.assign({}, state), { operator }));
     };
+    const getOperatorFn = (operator) => {
+        switch (operator) {
+            case types_1.default.plus: {
+                return plus;
+            }
+            case types_1.default.minus: {
+                return minus;
+            }
+            case types_1.default.multiply: {
+                return multiply;
+            }
+            case types_1.default.divide: {
+                return divide;
+            }
+            default: {
+                return null;
+            }
+        }
+    };
     const onClickCalculateBtn = () => {
-        // TODO: 로직 줄이자, 나누자
         const { prevNumber, nextNumber, operator } = state;
         if (!prevNumber)
             return;
@@ -33230,37 +33249,16 @@ function Calculator() {
             setState(Object.assign(Object.assign({}, state), { operator: types_1.default.empty }));
             return;
         }
-        let operatorFn = null;
-        switch (operator) {
-            case types_1.default.plus: {
-                operatorFn = plus;
-                break;
-            }
-            case types_1.default.minus: {
-                operatorFn = minus;
-                break;
-            }
-            case types_1.default.multiply: {
-                operatorFn = multiply;
-                break;
-            }
-            case types_1.default.divide: {
-                operatorFn = divide;
-                break;
-            }
-            default: {
-                operatorFn = null;
-            }
-        }
+        const operatorFn = getOperatorFn(operator);
         if (operatorFn === null)
             return;
         const result = Math.floor(operatorFn(prevNumber, nextNumber));
         if (Number.isNaN(result)) {
-            setState(Object.assign({}, errorState('숫자 아님')));
+            setState(Object.assign({}, errorState(ERROR_MESSAGE.NOT_NUMBER)));
             return;
         }
         if (!Number.isFinite(result)) {
-            setState(Object.assign({}, errorState('오류')));
+            setState(Object.assign({}, errorState(ERROR_MESSAGE.INFINITY_NUMBER)));
             return;
         }
         setState({ prevNumber: result, nextNumber: null, operator: types_1.default.empty, result: `${result}` });
@@ -33270,9 +33268,9 @@ function Calculator() {
         react_1.default.createElement("h1", { id: "total" }, result),
         react_1.default.createElement("div", { className: "digits flex" }, DIGITS.map(({ id, digit }) => (react_1.default.createElement(DigitButton_1.default, { key: id, onClickDigitBtn: onClickDigitBtn, digit: digit })))),
         react_1.default.createElement("div", { className: "modifiers subgrid" },
-            react_1.default.createElement("button", { className: "modifier", type: "button", onClick: () => setState(Object.assign({}, initialState)) }, "AC")),
+            react_1.default.createElement("button", { className: "modifier", type: "button", onClick: onClickReset }, "AC")),
         react_1.default.createElement("div", { className: "operations subgrid" },
-            operators.map(operator => (react_1.default.createElement(OperatorButton_1.default, { key: operator, operator: operator, onClickOperator: onClickOperator }))),
+            operators.map(operator => (react_1.default.createElement(OperatorButton_1.default, { key: operator, isFocused: state.operator === operator, operator: operator, onClickOperator: onClickOperator }))),
             react_1.default.createElement("button", { id: "calculate-equal", className: "operation", type: "button", onClick: onClickCalculateBtn }, "="))));
 }
 exports["default"] = Calculator;
@@ -33312,8 +33310,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const react_1 = __importDefault(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-function OperatorButton({ operator, onClickOperator }) {
-    return (react_1.default.createElement("button", { className: "operation", type: "button", "data-operator": operator, onClick: onClickOperator }, operator));
+function OperatorButton({ isFocused, operator, onClickOperator }) {
+    const className = isFocused ? 'operation focused' : 'operation';
+    return (react_1.default.createElement("button", { className: className, type: "button", "data-operator": operator, onClick: onClickOperator }, operator));
 }
 exports["default"] = OperatorButton;
 
