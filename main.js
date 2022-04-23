@@ -33122,165 +33122,200 @@ if (false) {} else {
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 /* eslint-disable no-underscore-dangle */
-const react_1 = __importDefault(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-var Operator;
-(function (Operator) {
-    Operator["empty"] = "";
-    Operator["plus"] = "plus";
-    Operator["minus"] = "minus";
-    Operator["multiply"] = "multiply";
-    Operator["divide"] = "divide";
-})(Operator || (Operator = {}));
-class Calculator extends react_1.default.Component {
-    constructor(props) {
-        var _a;
-        super(props);
-        this.saveCurrentStateBeforeLeave = (event) => {
-            event.preventDefault();
-            localStorage.setItem(Calculator.localStorageKey, JSON.stringify(this.state));
-        };
-        this.onClickDigitBtn = ({ target }) => {
-            const { prevNumber, nextNumber, operator } = this.state;
-            const { digit } = target.dataset;
-            if (!digit)
-                return;
-            const isPrevNumberTurn = operator === Operator.empty;
-            if (isPrevNumberTurn) {
-                if (prevNumber === null) {
-                    const _prevNumber = Number(digit);
-                    this.setState({ prevNumber: _prevNumber, result: `${_prevNumber}` });
-                    return;
-                }
-                if (`${prevNumber}`.length >= 3)
-                    return;
-                const _prevNumber = Number(prevNumber + digit);
-                this.setState({ prevNumber: _prevNumber, result: `${_prevNumber}` });
-                return;
-            }
-            if (nextNumber === null) {
-                const _nextNumber = Number(digit);
-                this.setState({ nextNumber: _nextNumber, result: `${_nextNumber}` });
-                return;
-            }
-            if (`${nextNumber}`.length >= 3)
-                return;
-            const _nextNumber = Number(nextNumber + digit);
-            this.setState({ nextNumber: _nextNumber, result: `${_nextNumber}` });
-        };
-        this.onClickOperator = ({ target }) => {
-            const { prevNumber } = this.state;
-            const { operator } = target.dataset;
-            if (!operator)
-                return;
-            const isValidOperator = Object.values(Operator).includes(operator);
-            if (!isValidOperator) {
-                this.setState(Object.assign({}, Calculator.errorState('유효한 연산자가 아닙니다')));
-                return;
-            }
-            if (!prevNumber) {
-                this.setState(Object.assign({}, Calculator.errorState('숫자를 먼저 입력해 주세요')));
-                return;
-            }
-            this.setState({ operator: operator });
-        };
-        this.onClickCalculateBtn = () => {
-            const { prevNumber, nextNumber, operator } = this.state;
-            if (!prevNumber)
-                return;
-            if (!operator)
-                return;
-            if (nextNumber === null) {
-                this.setState({ operator: Operator.empty });
-                return;
-            }
-            let operatorFn = null;
-            switch (operator) {
-                case Operator.plus: {
-                    operatorFn = this.plus;
-                    break;
-                }
-                case Operator.minus: {
-                    operatorFn = this.minus;
-                    break;
-                }
-                case Operator.multiply: {
-                    operatorFn = this.multiply;
-                    break;
-                }
-                case Operator.divide: {
-                    operatorFn = this.divide;
-                    break;
-                }
-                default: {
-                    operatorFn = null;
-                }
-            }
-            if (operatorFn === null)
-                return;
-            const result = Math.floor(operatorFn(prevNumber, nextNumber));
-            if (Number.isNaN(result)) {
-                this.setState(Object.assign({}, Calculator.errorState('숫자 아님')));
-                return;
-            }
-            if (!Number.isFinite(result)) {
-                this.setState(Object.assign({}, Calculator.errorState('오류')));
-                return;
-            }
-            this.setState({ prevNumber: result, nextNumber: null, operator: Operator.empty, result: `${result}` });
-        };
-        this.plus = (num1, num2) => num1 + num2;
-        this.minus = (num1, num2) => num1 - num2;
-        this.multiply = (num1, num2) => num1 * num2;
-        this.divide = (num1, num2) => num1 / num2;
-        const originalState = JSON.parse((_a = localStorage.getItem(Calculator.localStorageKey)) !== null && _a !== void 0 ? _a : '{}');
-        this.state = Object.assign(Object.assign({}, Calculator.initialState), originalState);
-        window.addEventListener('beforeunload', this.saveCurrentStateBeforeLeave);
-        window.onbeforeunload = () => {
-            return 'Are you sure you want to leave?';
-        };
-    }
-    componentWillUnmount() {
-        window.removeEventListener('beforeunload', this.saveCurrentStateBeforeLeave);
-    }
-    render() {
-        const { result } = this.state;
-        return (react_1.default.createElement("div", { className: "calculator" },
-            react_1.default.createElement("h1", { id: "total" }, result),
-            react_1.default.createElement("div", { className: "digits flex" },
-                react_1.default.createElement("button", { className: "digit", type: "button", "data-digit": "9", onClick: this.onClickDigitBtn }, "9"),
-                react_1.default.createElement("button", { className: "digit", type: "button", "data-digit": "8", onClick: this.onClickDigitBtn }, "8"),
-                react_1.default.createElement("button", { className: "digit", type: "button", "data-digit": "7", onClick: this.onClickDigitBtn }, "7"),
-                react_1.default.createElement("button", { className: "digit", type: "button", "data-digit": "6", onClick: this.onClickDigitBtn }, "6"),
-                react_1.default.createElement("button", { className: "digit", type: "button", "data-digit": "5", onClick: this.onClickDigitBtn }, "5"),
-                react_1.default.createElement("button", { className: "digit", type: "button", "data-digit": "4", onClick: this.onClickDigitBtn }, "4"),
-                react_1.default.createElement("button", { className: "digit", type: "button", "data-digit": "3", onClick: this.onClickDigitBtn }, "3"),
-                react_1.default.createElement("button", { className: "digit", type: "button", "data-digit": "2", onClick: this.onClickDigitBtn }, "2"),
-                react_1.default.createElement("button", { className: "digit", type: "button", "data-digit": "1", onClick: this.onClickDigitBtn }, "1"),
-                react_1.default.createElement("button", { className: "digit", type: "button", "data-digit": "0", onClick: this.onClickDigitBtn }, "0")),
-            react_1.default.createElement("div", { className: "modifiers subgrid" },
-                react_1.default.createElement("button", { className: "modifier", type: "button", onClick: () => this.setState(Object.assign({}, Calculator.initialState)) }, "AC")),
-            react_1.default.createElement("div", { className: "operations subgrid" },
-                react_1.default.createElement("button", { className: "operation", type: "button", "data-operator": "divide", onClick: this.onClickOperator }, "/"),
-                react_1.default.createElement("button", { className: "operation", type: "button", "data-operator": "multiply", onClick: this.onClickOperator }, "X"),
-                react_1.default.createElement("button", { className: "operation", type: "button", "data-operator": "minus", onClick: this.onClickOperator }, "-"),
-                react_1.default.createElement("button", { className: "operation", type: "button", "data-operator": "plus", onClick: this.onClickOperator }, "+"),
-                react_1.default.createElement("button", { id: "calculate-equal", className: "operation", type: "button", onClick: this.onClickCalculateBtn }, "="))));
-    }
-}
-Calculator.localStorageKey = 'calculator-key';
-Calculator.initialState = {
+// eslint-disable-next-line import/extensions
+const nanoid_1 = __webpack_require__(/*! nanoid */ "./node_modules/nanoid/index.browser.js");
+const react_1 = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+const DigitButton_1 = __importDefault(__webpack_require__(/*! ./components/DigitButton */ "./src/components/DigitButton.tsx"));
+const OperatorButton_1 = __importDefault(__webpack_require__(/*! ./components/OperatorButton */ "./src/components/OperatorButton.tsx"));
+const types_1 = __importDefault(__webpack_require__(/*! ./types */ "./src/types.ts"));
+const operators = [types_1.default.plus, types_1.default.minus, types_1.default.multiply, types_1.default.divide];
+// [9, 8, 7, 6, 5, 4, 3, 2, 1, 0];
+const DIGITS = Array.from({ length: 10 }, (_, i) => ({ id: (0, nanoid_1.nanoid)(), digit: 9 - i }));
+const initialState = {
     prevNumber: null,
     nextNumber: null,
-    operator: Operator.empty,
+    operator: types_1.default.empty,
     result: '0',
 };
-Calculator.errorState = (errorMessage) => (Object.assign(Object.assign({}, Calculator.initialState), { result: errorMessage }));
+const errorState = (errorMessage) => (Object.assign(Object.assign({}, initialState), { result: errorMessage }));
+function Calculator() {
+    const [state, setState] = (0, react_1.useState)(Object.assign({}, initialState));
+    // useCallback
+    const plus = (num1, num2) => num1 + num2;
+    const minus = (num1, num2) => num1 - num2;
+    const multiply = (num1, num2) => num1 * num2;
+    const divide = (num1, num2) => num1 / num2;
+    const onClickDigitBtn = ({ target }) => {
+        const { prevNumber, nextNumber, operator } = state;
+        const { digit } = target.dataset;
+        if (!digit)
+            return;
+        const isPrevNumberTurn = operator === types_1.default.empty;
+        // TODO: 리팩토링 할 것
+        if (isPrevNumberTurn) {
+            if (prevNumber === null) {
+                const _prevNumber = Number(digit);
+                setState(Object.assign(Object.assign({}, state), { prevNumber: _prevNumber, result: `${_prevNumber}` }));
+                return;
+            }
+            if (`${prevNumber}`.length >= 3)
+                return;
+            const _prevNumber = Number(prevNumber + digit);
+            setState(Object.assign(Object.assign({}, state), { prevNumber: _prevNumber, result: `${_prevNumber}` }));
+            return;
+        }
+        if (nextNumber === null) {
+            const _nextNumber = Number(digit);
+            setState(Object.assign(Object.assign({}, state), { nextNumber: _nextNumber, result: `${_nextNumber}` }));
+            return;
+        }
+        if (`${nextNumber}`.length >= 3)
+            return;
+        const _nextNumber = Number(nextNumber + digit);
+        setState(Object.assign(Object.assign({}, state), { nextNumber: _nextNumber, result: `${_nextNumber}` }));
+    };
+    const onClickOperator = ({ target }) => {
+        // TODO: 개행 리팩토링
+        const { prevNumber } = state;
+        const { operator } = target.dataset;
+        if (!operator)
+            return;
+        const isValidOperator = Object.values(types_1.default).includes(operator);
+        if (!isValidOperator) {
+            setState(Object.assign({}, errorState('유효한 연산자가 아닙니다')));
+            return;
+        }
+        if (!prevNumber) {
+            setState(Object.assign({}, errorState('숫자를 먼저 입력해 주세요')));
+            return;
+        }
+        setState(Object.assign(Object.assign({}, state), { operator }));
+    };
+    const onClickCalculateBtn = () => {
+        // TODO: 로직 줄이자, 나누자
+        const { prevNumber, nextNumber, operator } = state;
+        if (!prevNumber)
+            return;
+        if (!operator)
+            return;
+        if (nextNumber === null) {
+            setState(Object.assign(Object.assign({}, state), { operator: types_1.default.empty }));
+            return;
+        }
+        let operatorFn = null;
+        switch (operator) {
+            case types_1.default.plus: {
+                operatorFn = plus;
+                break;
+            }
+            case types_1.default.minus: {
+                operatorFn = minus;
+                break;
+            }
+            case types_1.default.multiply: {
+                operatorFn = multiply;
+                break;
+            }
+            case types_1.default.divide: {
+                operatorFn = divide;
+                break;
+            }
+            default: {
+                operatorFn = null;
+            }
+        }
+        if (operatorFn === null)
+            return;
+        const result = Math.floor(operatorFn(prevNumber, nextNumber));
+        if (Number.isNaN(result)) {
+            setState(Object.assign({}, errorState('숫자 아님')));
+            return;
+        }
+        if (!Number.isFinite(result)) {
+            setState(Object.assign({}, errorState('오류')));
+            return;
+        }
+        setState({ prevNumber: result, nextNumber: null, operator: types_1.default.empty, result: `${result}` });
+    };
+    const { result } = state;
+    return (react_1.default.createElement("div", { className: "calculator" },
+        react_1.default.createElement("h1", { id: "total" }, result),
+        react_1.default.createElement("div", { className: "digits flex" }, DIGITS.map(({ id, digit }) => (react_1.default.createElement(DigitButton_1.default, { key: id, onClickDigitBtn: onClickDigitBtn, digit: digit })))),
+        react_1.default.createElement("div", { className: "modifiers subgrid" },
+            react_1.default.createElement("button", { className: "modifier", type: "button", onClick: () => setState(Object.assign({}, initialState)) }, "AC")),
+        react_1.default.createElement("div", { className: "operations subgrid" },
+            operators.map(operator => (react_1.default.createElement(OperatorButton_1.default, { key: operator, operator: operator, onClickOperator: onClickOperator }))),
+            react_1.default.createElement("button", { id: "calculate-equal", className: "operation", type: "button", onClick: onClickCalculateBtn }, "="))));
+}
 exports["default"] = Calculator;
+
+
+/***/ }),
+
+/***/ "./src/components/DigitButton.tsx":
+/*!****************************************!*\
+  !*** ./src/components/DigitButton.tsx ***!
+  \****************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const react_1 = __importDefault(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+function DigitButton({ digit, onClickDigitBtn }) {
+    return (react_1.default.createElement("button", { className: "digit", type: "button", "data-digit": digit, onClick: onClickDigitBtn }, digit));
+}
+exports["default"] = DigitButton;
+
+
+/***/ }),
+
+/***/ "./src/components/OperatorButton.tsx":
+/*!*******************************************!*\
+  !*** ./src/components/OperatorButton.tsx ***!
+  \*******************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const react_1 = __importDefault(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+function OperatorButton({ operator, onClickOperator }) {
+    return (react_1.default.createElement("button", { className: "operation", type: "button", "data-operator": operator, onClick: onClickOperator }, operator));
+}
+exports["default"] = OperatorButton;
 
 
 /***/ }),
@@ -33300,11 +33335,102 @@ const react_1 = __importDefault(__webpack_require__(/*! react */ "./node_modules
 const client_1 = __importDefault(__webpack_require__(/*! react-dom/client */ "./node_modules/react-dom/client.js"));
 const Calculator_1 = __importDefault(__webpack_require__(/*! ./Calculator */ "./src/Calculator.tsx"));
 __webpack_require__(/*! ./scss/style.scss */ "./src/scss/style.scss");
-const $root = document.querySelector('#root');
+const $root = document.getElementById('root');
 if ($root) {
     const root = client_1.default.createRoot($root);
     root.render(react_1.default.createElement(Calculator_1.default, null));
 }
+
+
+/***/ }),
+
+/***/ "./src/types.ts":
+/*!**********************!*\
+  !*** ./src/types.ts ***!
+  \**********************/
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+var Operator;
+(function (Operator) {
+    Operator["empty"] = "";
+    Operator["plus"] = "+";
+    Operator["minus"] = "-";
+    Operator["multiply"] = "*";
+    Operator["divide"] = "/";
+})(Operator || (Operator = {}));
+exports["default"] = Operator;
+
+
+/***/ }),
+
+/***/ "./node_modules/nanoid/index.browser.js":
+/*!**********************************************!*\
+  !*** ./node_modules/nanoid/index.browser.js ***!
+  \**********************************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "customAlphabet": () => (/* binding */ customAlphabet),
+/* harmony export */   "customRandom": () => (/* binding */ customRandom),
+/* harmony export */   "nanoid": () => (/* binding */ nanoid),
+/* harmony export */   "random": () => (/* binding */ random),
+/* harmony export */   "urlAlphabet": () => (/* reexport safe */ _url_alphabet_index_js__WEBPACK_IMPORTED_MODULE_0__.urlAlphabet)
+/* harmony export */ });
+/* harmony import */ var _url_alphabet_index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./url-alphabet/index.js */ "./node_modules/nanoid/url-alphabet/index.js");
+
+let random = bytes => crypto.getRandomValues(new Uint8Array(bytes))
+let customRandom = (alphabet, defaultSize, getRandom) => {
+  let mask = (2 << (Math.log(alphabet.length - 1) / Math.LN2)) - 1
+  let step = -~((1.6 * mask * defaultSize) / alphabet.length)
+  return (size = defaultSize) => {
+    let id = ''
+    while (true) {
+      let bytes = getRandom(step)
+      let j = step
+      while (j--) {
+        id += alphabet[bytes[j] & mask] || ''
+        if (id.length === size) return id
+      }
+    }
+  }
+}
+let customAlphabet = (alphabet, size = 21) =>
+  customRandom(alphabet, size, random)
+let nanoid = (size = 21) =>
+  crypto.getRandomValues(new Uint8Array(size)).reduce((id, byte) => {
+    byte &= 63
+    if (byte < 36) {
+      id += byte.toString(36)
+    } else if (byte < 62) {
+      id += (byte - 26).toString(36).toUpperCase()
+    } else if (byte > 62) {
+      id += '-'
+    } else {
+      id += '_'
+    }
+    return id
+  }, '')
+
+
+
+/***/ }),
+
+/***/ "./node_modules/nanoid/url-alphabet/index.js":
+/*!***************************************************!*\
+  !*** ./node_modules/nanoid/url-alphabet/index.js ***!
+  \***************************************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "urlAlphabet": () => (/* binding */ urlAlphabet)
+/* harmony export */ });
+let urlAlphabet =
+  'useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict'
+
 
 
 /***/ })
@@ -33339,6 +33465,23 @@ if ($root) {
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/make namespace object */
 /******/ 	(() => {
 /******/ 		// define __esModule on exports
