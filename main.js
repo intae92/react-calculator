@@ -33218,7 +33218,7 @@ function Calculator() {
             setState(Object.assign({}, errorState(ERROR_MESSAGE.INPUT_ORDER)));
             return;
         }
-        setState(Object.assign(Object.assign({}, state), { operator }));
+        setState(prevState => (Object.assign(Object.assign({}, prevState), { operator })));
     };
     const getOperatorFn = (operator) => {
         switch (operator) {
@@ -33246,7 +33246,7 @@ function Calculator() {
         if (!operator)
             return;
         if (nextNumber === null) {
-            setState(Object.assign(Object.assign({}, state), { operator: types_1.default.empty }));
+            setState(prevState => (Object.assign(Object.assign({}, prevState), { operator: types_1.default.empty })));
             return;
         }
         const operatorFn = getOperatorFn(operator);
