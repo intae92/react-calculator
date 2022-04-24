@@ -33186,27 +33186,24 @@ function Calculator() {
         }
         setState(prevState => (Object.assign(Object.assign({}, prevState), { nextNumber: newNumber, result: `${newNumber}` })));
     };
-    const onClickDigitBtn = ({ target }) => {
+    const onClickDigitBtn = (digit) => (event) => {
         const { prevNumber, nextNumber, operator } = state;
-        const { digit } = target.dataset;
-        if (!digit)
-            return;
         const isPrevNumberTurn = operator === types_1.default.empty;
         const targetNumber = isPrevNumberTurn ? prevNumber : nextNumber;
         if (targetNumber === null) {
-            updateNumber({ isPrevNumberTurn, newNumber: Number(digit) });
+            updateNumber({ isPrevNumberTurn, newNumber: digit });
             return;
         }
         if (`${targetNumber}`.length >= 3) {
             window.alert(ERROR_MESSAGE.MAX_DIGIT);
             return;
         }
-        updateNumber({ isPrevNumberTurn, newNumber: Number(targetNumber + digit) });
+        const newNumberToString = `${targetNumber}${digit}`;
+        updateNumber({ isPrevNumberTurn, newNumber: Number(newNumberToString) });
     };
     const onClickReset = () => setState(Object.assign({}, initialState));
-    const onClickOperator = ({ target }) => {
+    const onClickOperator = (operator) => (event) => {
         const { prevNumber } = state;
-        const { operator } = target.dataset;
         if (!operator)
             return;
         const isValidOperator = Object.values(types_1.default).includes(operator);
@@ -33291,7 +33288,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const react_1 = __importDefault(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
 function DigitButton({ digit, onClickDigitBtn }) {
-    return (react_1.default.createElement("button", { className: "digit", type: "button", "data-digit": digit, onClick: onClickDigitBtn }, digit));
+    return (react_1.default.createElement("button", { className: "digit", type: "button", onClick: e => onClickDigitBtn(digit)(e) }, digit));
 }
 exports["default"] = DigitButton;
 
@@ -33312,7 +33309,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const react_1 = __importDefault(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
 function OperatorButton({ isFocused, operator, onClickOperator }) {
     const className = isFocused ? 'operation focused' : 'operation';
-    return (react_1.default.createElement("button", { className: className, type: "button", "data-operator": operator, onClick: onClickOperator }, operator));
+    return (react_1.default.createElement("button", { className: className, type: "button", onClick: e => onClickOperator(operator)(e) }, operator));
 }
 exports["default"] = OperatorButton;
 
